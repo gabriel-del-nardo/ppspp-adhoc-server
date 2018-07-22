@@ -130,6 +130,9 @@ extern SceNetAdhocctlUserNode * _db_user;
 // Game Database
 extern SceNetAdhocctlGameNode * _db_game;
 
+// Log file
+extern logfile;
+
 /**
  * Login User into Database (Stream)
  * @param fd Socket
