@@ -36,9 +36,11 @@ SceNetAdhocctlUserNode * _db_user = NULL;
 // Game Database
 SceNetAdhocctlGameNode * _db_game = NULL;
 
-FILE * logfile = fopen("file.txt", "w");
+FILE * logfile;
 
-if (f == NULL)
+logfile = fopen("file.txt", "w");
+
+if (logfile == NULL)
 {
     printf("Error opening file!\n");
     exit(1);
