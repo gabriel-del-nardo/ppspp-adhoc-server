@@ -36,15 +36,7 @@ SceNetAdhocctlUserNode * _db_user = NULL;
 // Game Database
 SceNetAdhocctlGameNode * _db_game = NULL;
 
-FILE * logfile;
-
-logfile = fopen("file.txt", "w");
-
-if (logfile == NULL)
-{
-    printf("Error opening file!\n");
-    exit(1);
-}
+FILE *logfile;
 
 /**
  * Login User into Database (Stream)
@@ -85,12 +77,21 @@ void login_user_stream(int fd, uint32_t ip)
 				
 				// Initialize Death Clock
 				user->last_recv = time(NULL);
+
+				logfile = fopen("file.txt", "w");
+
+				if (logfile == NULL)
+				{
+				    printf("Error opening file!\n");
+				    exit(1);
+				}
 				
 				// Notify User
 				uint8_t * ipa = (uint8_t *)&user->resolver.ip;
 				printf("New Connection from %u.%u.%u.%u.\n", ipa[0], ipa[1], ipa[2], ipa[3]);
 				fprintf(logfile, "New Connection from %u.%u.%u.%u.\n", ipa[0], ipa[1], ipa[2], ipa[3]);
 				
+				fclose(logfile);
 				// Fix User Counter
 				_db_user_count++;
 				
@@ -170,6 +171,14 @@ void login_user_data(SceNetAdhocctlUserNode * user, SceNetAdhocctlLoginPacketC2S
 			
 			// Link Game to Player
 			user->game = game;
+
+			logfile = fopen("file.txt", "w");
+
+			if (logfile == NULL)
+			{
+			    printf("Error opening file!\n");
+			    exit(1);
+			}
 			
 			// Notify User
 			uint8_t * ip = (uint8_t *)&user->resolver.ip;
@@ -179,6 +188,8 @@ void login_user_data(SceNetAdhocctlUserNode * user, SceNetAdhocctlLoginPacketC2S
 			printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) started playing %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
 			fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) started playing %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
 			
+
+			fclose(logfile);
 			// Update Status Log
 			update_status();
 			
@@ -190,10 +201,19 @@ void login_user_data(SceNetAdhocctlUserNode * user, SceNetAdhocctlLoginPacketC2S
 	// Invalid Packet Data
 	else
 	{
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
 		// Notify User
 		uint8_t * ip = (uint8_t *)&user->resolver.ip;
 		printf("Invalid Login Packet Contents from %u.%u.%u.%u.\n", ip[0], ip[1], ip[2], ip[3]);
 		fprintf(logfile, "Invalid Login Packet Contents from %u.%u.%u.%u.\n", ip[0], ip[1], ip[2], ip[3]);
+
+		fclose(logfile);
 	}
 	
 	// Logout User - Out of Memory or Invalid Arguments
@@ -224,6 +244,14 @@ void logout_user(SceNetAdhocctlUserNode * user)
 	// Playing User
 	if(user->game != NULL)
 	{
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		// Notify User
 		uint8_t * ip = (uint8_t *)&user->resolver.ip;
 		char safegamestr[10];
@@ -232,6 +260,7 @@ void logout_user(SceNetAdhocctlUserNode * user)
 		printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) stopped playing %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
 		fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) stopped playing %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
 		
+		fclose(logfile);
 		// Fix Game Player Count
 		user->game->playercount--;
 		
@@ -255,10 +284,19 @@ void logout_user(SceNetAdhocctlUserNode * user)
 	// Unidentified User
 	else
 	{
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
 		// Notify User
 		uint8_t * ip = (uint8_t *)&user->resolver.ip;
 		printf("Dropped Connection to %u.%u.%u.%u.\n", ip[0], ip[1], ip[2], ip[3]);
 		fprintf(logfile, "Dropped Connection to %u.%u.%u.%u.\n", ip[0], ip[1], ip[2], ip[3]);
+
+		fclose(logfile);
 	}
 	
 	// Free Memory
@@ -446,9 +484,19 @@ void connect_user(SceNetAdhocctlUserNode * user, SceNetAdhocctlGroupName * group
 				char safegroupstr[9];
 				memset(safegroupstr, 0, sizeof(safegroupstr));
 				strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
+
+				logfile = fopen("file.txt", "w");
+
+				if (logfile == NULL)
+				{
+				    printf("Error opening file!\n");
+				    exit(1);
+				}
+
 				printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) joined %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
 				fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) joined %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
 
+				fclose(logfile);
 				// Update Status Log
 				update_status();
 				
@@ -471,8 +519,19 @@ void connect_user(SceNetAdhocctlUserNode * user, SceNetAdhocctlGroupName * group
 			char safegroupstr2[9];
 			memset(safegroupstr2, 0, sizeof(safegroupstr2));
 			strncpy(safegroupstr2, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
+
+			logfile = fopen("file.txt", "w");
+
+			if (logfile == NULL)
+			{
+			    printf("Error opening file!\n");
+			    exit(1);
+			}
+
 			printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to join %s group %s without disconnecting from %s first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr, safegroupstr2);
 			fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to join %s group %s without disconnecting from %s first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr, safegroupstr2);
+
+			fclose(logfile);
 		}
 	}
 	
@@ -487,8 +546,19 @@ void connect_user(SceNetAdhocctlUserNode * user, SceNetAdhocctlGroupName * group
 		char safegroupstr[9];
 		memset(safegroupstr, 0, sizeof(safegroupstr));
 		strncpy(safegroupstr, (char *)group->data, ADHOCCTL_GROUPNAME_LEN);
+
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to join invalid %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
 		fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to join invalid %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
+		
+		fclose(logfile);
 	}
 	
 	// Invalid State, Out of Memory or Invalid Group Name
@@ -547,9 +617,19 @@ void disconnect_user(SceNetAdhocctlUserNode * user)
 		char safegroupstr[9];
 		memset(safegroupstr, 0, sizeof(safegroupstr));
 		strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
+
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) left %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
 		fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) left %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
 		
+		fclose(logfile);
 		// Empty Group
 		if(user->group->playercount == 0)
 		{
@@ -589,8 +669,19 @@ void disconnect_user(SceNetAdhocctlUserNode * user)
 		char safegamestr[10];
 		memset(safegamestr, 0, sizeof(safegamestr));
 		strncpy(safegamestr, user->game->game.data, PRODUCT_CODE_LENGTH);
+
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to leave %s group without joining one first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
 		fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to leave %s group without joining one first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
+		
+		fclose(logfile);
 	}
 	
 	// Delete User
@@ -647,9 +738,19 @@ void send_scan_results(SceNetAdhocctlUserNode * user)
 		char safegamestr[10];
 		memset(safegamestr, 0, sizeof(safegamestr));
 		strncpy(safegamestr, user->game->game.data, PRODUCT_CODE_LENGTH);
+
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) requested information on %d %s groups.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], user->game->groupcount, safegamestr);
 		fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) requested information on %d %s groups.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], user->game->groupcount, safegamestr);
 		
+		fclose(logfile);
 		// Exit Function
 		return;
 	}
@@ -665,8 +766,19 @@ void send_scan_results(SceNetAdhocctlUserNode * user)
 		char safegroupstr[9];
 		memset(safegroupstr, 0, sizeof(safegroupstr));
 		strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
+
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		printf("%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to scan for %s groups without disconnecting from %s first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
 		fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to scan for %s groups without disconnecting from %s first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr, safegroupstr);
+		
+		fclose(logfile);
 	}
 	
 	// Delete User
@@ -763,7 +875,17 @@ void spread_message(SceNetAdhocctlUserNode * user, char * message)
 			char safegroupstr[9];
 			memset(safegroupstr, 0, sizeof(safegroupstr));
 			strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
+			logfile = fopen("file.txt", "w");
+
+			if (logfile == NULL)
+			{
+			    printf("Error opening file!\n");
+			    exit(1);
+			}
+
 			fprintf(logfile, "%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) sent \"%s\" to %d players in %s group %s.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], message, counter, safegamestr, safegroupstr);
+		
+			fclose(logfile);
 		}
 		
 		// Exit Function
@@ -778,7 +900,18 @@ void spread_message(SceNetAdhocctlUserNode * user, char * message)
 		char safegamestr[10];
 		memset(safegamestr, 0, sizeof(safegamestr));
 		strncpy(safegamestr, user->game->game.data, PRODUCT_CODE_LENGTH);
+
+		logfile = fopen("file.txt", "w");
+
+		if (logfile == NULL)
+		{
+		    printf("Error opening file!\n");
+		    exit(1);
+		}
+
 		fprintf(logfile,"%s (MAC: %02X:%02X:%02X:%02X:%02X:%02X - IP: %u.%u.%u.%u) attempted to send a text message without joining a %s group first.\n", (char *)user->resolver.name.data, user->resolver.mac.data[0], user->resolver.mac.data[1], user->resolver.mac.data[2], user->resolver.mac.data[3], user->resolver.mac.data[4], user->resolver.mac.data[5], ip[0], ip[1], ip[2], ip[3], safegamestr);
+		
+		fclose(logfile);
 	}
 	
 	// Delete User
@@ -877,10 +1010,20 @@ void game_product_override(SceNetAdhocctlProductCode * product)
 					
 					// Crosslink Product Code
 					strncpy(product->data, crosslink, PRODUCT_CODE_LENGTH);
+
+					logfile = fopen("file.txt", "w");
+
+					if (logfile == NULL)
+					{
+					    printf("Error opening file!\n");
+					    exit(1);
+					}
 					
 					// Log Crosslink
 					printf("Crosslinked %s to %s.\n", productid, crosslink);
 					fprintf(logfile, "Crosslinked %s to %s.\n", productid, crosslink);
+
+					fclose(logfile);
 					
 					// Set Crosslinked Flag
 					crosslinked = 1;
@@ -924,9 +1067,19 @@ void game_product_override(SceNetAdhocctlProductCode * product)
 						// Save Product ID to Database
 						if(sqlite3_step(statement) == SQLITE_DONE)
 						{
+
+							logfile = fopen("file.txt", "w");
+
+							if (logfile == NULL)
+							{
+							    printf("Error opening file!\n");
+							    exit(1);
+							}
 							// Log Addition
 							printf("Added Unknown Product ID %s to Database.\n", productid);
 							fprintf(logfile, "Added Unknown Product ID %s to Database.\n", productid);
+
+							fclose(logfile);
 						}
 					}
 					
