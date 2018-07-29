@@ -78,7 +78,7 @@ void login_user_stream(int fd, uint32_t ip)
 				// Initialize Death Clock
 				user->last_recv = time(NULL);
 
-				logfile = fopen("file.txt", "w");
+				logfile = fopen("file.txt", "a");
 
 				if (logfile == NULL)
 				{
@@ -172,7 +172,7 @@ void login_user_data(SceNetAdhocctlUserNode * user, SceNetAdhocctlLoginPacketC2S
 			// Link Game to Player
 			user->game = game;
 
-			logfile = fopen("file.txt", "w");
+			logfile = fopen("file.txt", "a");
 
 			if (logfile == NULL)
 			{
@@ -201,7 +201,7 @@ void login_user_data(SceNetAdhocctlUserNode * user, SceNetAdhocctlLoginPacketC2S
 	// Invalid Packet Data
 	else
 	{
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -244,7 +244,7 @@ void logout_user(SceNetAdhocctlUserNode * user)
 	// Playing User
 	if(user->game != NULL)
 	{
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -284,7 +284,7 @@ void logout_user(SceNetAdhocctlUserNode * user)
 	// Unidentified User
 	else
 	{
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -485,7 +485,7 @@ void connect_user(SceNetAdhocctlUserNode * user, SceNetAdhocctlGroupName * group
 				memset(safegroupstr, 0, sizeof(safegroupstr));
 				strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
 
-				logfile = fopen("file.txt", "w");
+				logfile = fopen("file.txt", "a");
 
 				if (logfile == NULL)
 				{
@@ -520,7 +520,7 @@ void connect_user(SceNetAdhocctlUserNode * user, SceNetAdhocctlGroupName * group
 			memset(safegroupstr2, 0, sizeof(safegroupstr2));
 			strncpy(safegroupstr2, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
 
-			logfile = fopen("file.txt", "w");
+			logfile = fopen("file.txt", "a");
 
 			if (logfile == NULL)
 			{
@@ -547,7 +547,7 @@ void connect_user(SceNetAdhocctlUserNode * user, SceNetAdhocctlGroupName * group
 		memset(safegroupstr, 0, sizeof(safegroupstr));
 		strncpy(safegroupstr, (char *)group->data, ADHOCCTL_GROUPNAME_LEN);
 
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -618,7 +618,7 @@ void disconnect_user(SceNetAdhocctlUserNode * user)
 		memset(safegroupstr, 0, sizeof(safegroupstr));
 		strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
 
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -670,7 +670,7 @@ void disconnect_user(SceNetAdhocctlUserNode * user)
 		memset(safegamestr, 0, sizeof(safegamestr));
 		strncpy(safegamestr, user->game->game.data, PRODUCT_CODE_LENGTH);
 
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -739,7 +739,7 @@ void send_scan_results(SceNetAdhocctlUserNode * user)
 		memset(safegamestr, 0, sizeof(safegamestr));
 		strncpy(safegamestr, user->game->game.data, PRODUCT_CODE_LENGTH);
 
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -767,7 +767,7 @@ void send_scan_results(SceNetAdhocctlUserNode * user)
 		memset(safegroupstr, 0, sizeof(safegroupstr));
 		strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
 
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -875,7 +875,7 @@ void spread_message(SceNetAdhocctlUserNode * user, char * message)
 			char safegroupstr[9];
 			memset(safegroupstr, 0, sizeof(safegroupstr));
 			strncpy(safegroupstr, (char *)user->group->group.data, ADHOCCTL_GROUPNAME_LEN);
-			logfile = fopen("file.txt", "w");
+			logfile = fopen("file.txt", "a");
 
 			if (logfile == NULL)
 			{
@@ -901,7 +901,7 @@ void spread_message(SceNetAdhocctlUserNode * user, char * message)
 		memset(safegamestr, 0, sizeof(safegamestr));
 		strncpy(safegamestr, user->game->game.data, PRODUCT_CODE_LENGTH);
 
-		logfile = fopen("file.txt", "w");
+		logfile = fopen("file.txt", "a");
 
 		if (logfile == NULL)
 		{
@@ -1011,7 +1011,7 @@ void game_product_override(SceNetAdhocctlProductCode * product)
 					// Crosslink Product Code
 					strncpy(product->data, crosslink, PRODUCT_CODE_LENGTH);
 
-					logfile = fopen("file.txt", "w");
+					logfile = fopen("file.txt", "a");
 
 					if (logfile == NULL)
 					{
@@ -1068,7 +1068,7 @@ void game_product_override(SceNetAdhocctlProductCode * product)
 						if(sqlite3_step(statement) == SQLITE_DONE)
 						{
 
-							logfile = fopen("file.txt", "w");
+							logfile = fopen("file.txt", "a");
 
 							if (logfile == NULL)
 							{
