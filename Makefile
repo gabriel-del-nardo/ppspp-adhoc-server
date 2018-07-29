@@ -1,5 +1,5 @@
 CC = gcc
-SRC_DIR = ./src/
+SRC_DIR = ./build/src/
 CFLAGS = -fpack-struct -I. -I$(SRC_DIR)
 OBJ = main.o user.o status.o
 TARGET = AdhocServer

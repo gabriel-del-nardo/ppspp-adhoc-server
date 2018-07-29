@@ -22,6 +22,7 @@
 #include <config.h>
 #include <sqlite3.h>
 
+
 // Function Prototypes
 const char * strcpyxml(char * out, const char * in, uint32_t size);
 

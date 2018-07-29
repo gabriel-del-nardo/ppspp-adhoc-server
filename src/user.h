@@ -131,7 +131,7 @@ extern SceNetAdhocctlUserNode * _db_user;
 extern SceNetAdhocctlGameNode * _db_game;
 
 // Log file
-extern FILE *logfile;
+//extern FILE *logfile;
 
 /**
  * Login User into Database (Stream)
