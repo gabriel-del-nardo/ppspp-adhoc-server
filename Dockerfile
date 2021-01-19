@@ -12,10 +12,14 @@ RUN make
 
 FROM base
 
+USER ppsspp
+
 WORKDIR ~/AdhocServer
 
 COPY --from=builder /AdhocServer ./AdhocServer
 
 COPY database.db .
+
+EXPOSE 27312
 
 CMD ['./AdhocServer']

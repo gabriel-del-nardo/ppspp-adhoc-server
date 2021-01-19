@@ -1,10 +1,28 @@
 version: '3'
 
 services:
+  
   adhoc-pro:
+    image: adhoc_ppsspp
     build:
       context: ./
-    image: adhoc_ppsspp
     ports:
       - 27312:27312
     command: ./AdhocServer
+    restart: unless-stopped
+
+  duckdns:
+    image: ghcr.io/linuxserver/duckdns
+    container_name: duckdns
+    environment:
+      # - PUID=1000 #optional
+      # - PGID=1000 #optional
+      - TZ=america/caracas
+      - SUBDOMAINS={$SUBDOMAINS}
+      - TOKEN={$TOKEN}
+      - LOG_FILE=false #optional
+    depends_on:
+      - adhoc-pro
+    # volumes:
+    #   - /path/to/appdata/config:/config #optional
+    restart: unless-stopped
