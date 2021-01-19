@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  adhoc-pro:
+    build:
+      context: ./
+    image: adhoc_ppsspp
+    ports:
+      - 27312:27312
+    command: ./AdhocServer

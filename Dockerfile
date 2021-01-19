@@ -1,14 +1,21 @@
-# build the image
-#docker build --tag adhoc .
-# for running it in front
-#docker run -it --rm -p 27312:27312 --name test adhoc
-# in background
-#docker run -d -p 27312:27312 --name test adhoc
+FROM alpine:3 as base
 
-FROM debian:jessie
-COPY . /usr/src/AdhocServer
-WORKDIR /usr/src/AdhocServer
-RUN apt-get -y update
-RUN apt-get -y upgrade
-RUN apt-get install -y libsqlite3-dev
-CMD ["./AdhocServer"]
+RUN apk add sqlite-dev 
+
+FROM base as builder
+
+RUN apk add make gcc libc-dev
+
+COPY Makefile src ./
+
+RUN make
+
+FROM base
+
+WORKDIR ~/AdhocServer
+
+COPY --from=builder /AdhocServer ./AdhocServer
+
+COPY database.db .
+
+CMD ['./AdhocServer']
