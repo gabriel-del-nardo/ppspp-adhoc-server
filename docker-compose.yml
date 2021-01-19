@@ -17,7 +17,7 @@ services:
     environment:
       # - PUID=1000 #optional
       # - PGID=1000 #optional
-      - TZ=america/caracas
+      - TZ={$TZ}
       - SUBDOMAINS={$SUBDOMAINS}
       - TOKEN={$TOKEN}
       - LOG_FILE=false #optional
